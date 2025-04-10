@@ -4,13 +4,13 @@
     "patchDescription": "Modloader 2: Elfldr but cooler (as a single pnach)",
     "patchSegments": [
         {
-            "name": "Bump heap start",
+            "name": "Increase _end address/heap start",
             "org": "0x00100180",
             "source": "bin/ssx3/us/extend_end_address.bin"
         },
 
         {
-            "name": "Patch systemInit()",
+            "name": "Entry point (Patch systemInit())",
             "org": "0x0031af74",
             "source": "bin/ssx3/us/systeminit_patch.bin"
         },

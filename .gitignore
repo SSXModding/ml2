@@ -2,10 +2,12 @@ attic/
 
 bin/
 obj/
+.cache/
+
+compile_commands.json
 
 tools/cc
 tools/armips.exe
-*.exe
 
 # fucking pythonnnnnnn
 /**/__pycache__
