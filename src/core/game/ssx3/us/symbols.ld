@@ -18,6 +18,8 @@ CORE_LOAD_ADDRESS = 0x53f140;
 memset = 0x00416210;
 memcpy = 0x0041605c;
 
+scePrintf = 0x00425c60;
+
 /* Interesting globals */
 SSXApp = 0x004a28a8;
 
@@ -40,3 +42,10 @@ FILE_loadat = 0x003e1b68;
 
 /* BX REAL file functions */
 BXFILE_size = 0x00317f98;
+
+/* FILESYS_ */
+FILESYS_getopts = 0x003de928;
+FILESYS_setopts = 0x003de9b8;
+
+/* ASYNCFILE_ */
+ASYNCFILE_setcurrentpath = 0x003dde78;
