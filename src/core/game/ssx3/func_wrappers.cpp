@@ -25,10 +25,12 @@ void mlMemCpy(void* pDestBuffer, const void* pSrcBuffer, u32 copyLen) {
 }
 
 void* mlLoadFile(const char* pszFileName) {
-	u32 uiRel0Size = BXFILE_size(pszFileName);
-	if(uiRel0Size != 0) {
-		u8* pData = (unsigned char*)mlMalloc(uiRel0Size);
-		FILE_loadat(pszFileName, &pData[0], uiRel0Size);
+	// fun fact: this code techinically mirrors the same pattern
+	// that cFileParser::cFileParser() uses. but it works so hey
+	u32 uiFileSize = BXFILE_size(pszFileName);
+	if(uiFileSize != 0) {
+		u8* pData = (unsigned char*)mlMalloc(uiFileSize);
+		FILE_loadat(pszFileName, &pData[0], uiFileSize);
 		return (void*)pData;
 	}
 	return (void*)0;

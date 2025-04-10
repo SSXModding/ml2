@@ -1,10 +1,9 @@
-
-extern "C" {
-    void sioPuts(const char* pszIn);
-}
+#include <ml/sio.h>
+#include <ml/game.h>
 
 // Initalizes the ml core.
 // This shoulc be called once by hooking an appropiate game function.
 extern "C" void mlStart() {
-    sioPuts("it's alive.. maybe? perhapsibly? who knows");
+    sioPuts("ML2 prototype - modeco80");
+    mlGameInit();
 }

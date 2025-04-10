@@ -18,6 +18,7 @@ CORE_LOAD_ADDRESS = 0x53f140;
 memset = 0x00416210;
 memcpy = 0x0041605c;
 
+/* Interesting globals */
 SSXApp = 0x004a28a8;
 
 

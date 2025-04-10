@@ -12,7 +12,7 @@ GRDIR = src/core/game/$(GAME)/$(REGION)
 # _PRODUCTS=custom products to add to the build
 # _PNACH=output PNACH filename (using new pnach organization format)
 GAME_ssx3_us_VALID=yes
-GAME_ssx3_us_OBJECTS=$(OBJDIR)/func_wrappers.o
+GAME_ssx3_us_OBJECTS=$(OBJDIR)/func_wrappers.o $(OBJDIR)/init.o
 GAME_ssx3_us_PRODUCTS=$(BINDIR)/codemem_patch.bin $(BINDIR)/systeminit_patch.bin
 GAME_ssx3_us_PNACH=08FFF00D.ml2.pnach
 

@@ -28,11 +28,7 @@ extern "C" {
                 cGame* pGame;
         };
 
-#ifndef REL
         extern cSSXApplication* SSXApp;
-#else
-        #define SSXApp ((cSSXApplication*)0x004a28a8)
-#endif
 
         unsigned int BXFILE_size(const char* pszFileName);
         unsigned int FILE_loadat(const char* pszFileName, void* pData, unsigned int maxsize); // returns amount of bytes actually loaded?
