@@ -1,0 +1,11 @@
+attic/
+
+bin/
+obj/
+
+tools/cc
+tools/armips.exe
+*.exe
+
+# fucking pythonnnnnnn
+/**/__pycache__
