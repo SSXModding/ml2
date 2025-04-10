@@ -5,11 +5,6 @@ from __init__ import *
 import json
 import sys
 
-# Filename of the patch.json schema
-kPatchJsonFilename = 'patch.json'
-
-# Main 
-
 if len(sys.argv) != 3:
     print(f'Usage: {sys.argv[0]} [patch.json file] [output pnach file]')
     sys.exit(1)
