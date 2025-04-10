@@ -10,4 +10,4 @@ $(OBJDIR)/%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(BINDIR)/%.bin: %.asm
-	tools/armips.exe $(ASMFLAGS) $<
+	tools/assemble.sh $< $(BINDIR)/core.elf

@@ -8,8 +8,8 @@
 ; Is this nasty? Probably. Does it work? Uhhh fuck idk man ask Harold he will know
 .create "bin/ssx3/us/extend_end_address.bin",0x00100180
 .org 0x00100180
-    lui a0, hi(0x0053f2c8)
+    lui a0, hi(NEW_END_ADDRESS)
     lui a1, 0
-    addiu a0, a0, lo(0x0053f2c8)
+    addiu a0, a0, lo(NEW_END_ADDRESS)
 .close
 

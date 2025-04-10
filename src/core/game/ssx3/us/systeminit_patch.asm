@@ -9,5 +9,5 @@
 .create "bin/ssx3/us/systeminit_patch.bin", 0x0031af74
 .org 0x0031af74
 patch:
-    j 0x0053f140
+    j MLSTART_ADDRESS
 .close
