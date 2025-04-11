@@ -4,13 +4,19 @@
     "patchDescription": "Modloader 2: Elfldr but cooler (as a single pnach)",
     "patchSegments": [
         {
-            "name": "Increase _end address/heap start",
+            "name": "Patch Sony crt0 to move heap start",
             "org": "0x00100180",
-            "source": "bin/ssx3/us/extend_end_address.bin"
+            "source": "bin/ssx3/us/crt0_extend_heap.bin"
         },
 
         {
-            "name": "Entry point (Patch systemInit())",
+            "name": "Patch Sony libkernl to move heap start",
+            "org": "0x0045516c",
+            "source": "bin/ssx3/us/libkernl_extend_heap.bin"
+        },
+
+        {
+            "name": "ML2 Entry point (Patches systemInit())",
             "org": "0x0031af74",
             "source": "bin/ssx3/us/systeminit_patch.bin"
         },

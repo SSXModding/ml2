@@ -17,7 +17,7 @@ GAME_ssx3_mods = test_mod
 # _PNACH=output PNACH filename (using new pnach organization format)
 GAME_ssx3_us_VALID=yes
 GAME_ssx3_us_OBJECTS=$(OBJDIR)/func_wrappers.o $(OBJDIR)/init.o $(foreach mod,$(GAME_ssx3_mods),$(OBJDIR)/$(mod).o)
-GAME_ssx3_us_PRODUCTS=$(BINDIR)/codemem_patch.bin $(BINDIR)/systeminit_patch.bin
+GAME_ssx3_us_PRODUCTS=$(BINDIR)/crt0_patch.bin $(BINDIR)/libkernl_patch.bin $(BINDIR)/systeminit_patch.bin
 GAME_ssx3_us_PNACH=08FFF00D.ml2.pnach
 
 ifneq ($(GAME_$(GAME)_$(REGION)_VALID),yes)

@@ -9,6 +9,10 @@ void mlGameInit() {
 	sioPuts("mlGameInit() called");
 
 	// do some testing
-	mlFindMod("test")->enable();
+	if(mlFindMod("test") != 0) {
+		sioPuts("found test mod");
+	} else {
+		sioPuts(":( couldn't find test mod");
+	}
 }
 

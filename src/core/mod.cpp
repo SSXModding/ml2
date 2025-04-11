@@ -5,7 +5,7 @@
 #define nil(T) (T)0
 
 // 
-static mlMod* modListHead;
+static mlMod* modListHead = nil(mlMod*);
 
 // Returns true if both strings are equal and the same length.
 bool strEqual(const char* pszLeft, const char* pszRight) {
@@ -20,6 +20,12 @@ bool strEqual(const char* pszLeft, const char* pszRight) {
         pRightIter++;
     }
 
+    if(*pLeftIter == '\0' && *pRightIter != '\0')
+        return false;
+    
+    if(*pRightIter == '\0' && *pLeftIter != '\0')
+        return false;
+
     return true;
 }
 
@@ -28,7 +34,7 @@ void mlRegisterMod(mlMod* pMod) {
     sioPuts(pMod->getId());
 
     // TODO
-    if(!modListHead) {
+    if(modListHead == nil(mlMod*)) {
         modListHead = pMod;
         return;
     }
