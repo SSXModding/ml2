@@ -26,12 +26,9 @@ struct mlMod {
     mlMod* pNextMod;
 };
 
-
-
-
 void mlRegisterMod(mlMod* pMod);
+void mlModForEach(bool (*pcbCallback)(mlMod* pMod, void* context), void* context);
 mlMod* mlFindMod(const char* pszName);
-
 
 template<class T>
 struct mlModAutoRegister {
@@ -40,6 +37,7 @@ struct mlModAutoRegister {
     }
 };
 
+// Register a mod.
 #define ML_REGISTER_MOD(T) \
     static T __modInstance_##T; \
     static mlModAutoRegister<T> __modRegister_##T(&__modInstance_##T);
