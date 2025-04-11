@@ -6,25 +6,25 @@ SECTIONS {
 	. = CORE_LOAD_ADDRESS;
 	_begin = CORE_LOAD_ADDRESS;
 
-	.text : {
+	.text CORE_LOAD_ADDRESS : {
 		*(.text)
 		*(.text.*)
-    		*(.gnu.linkonce.t*)
+    	*(.gnu.linkonce.t*)
 	}
 
-/* C++ static constructors are not supported currently;
-	I see no reason for them to be required
-	.ctors 			  : {
+	.ctors : {
+		KEEP (*crtbegin.o(.ctors))
 		KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-	    	KEEP (*(SORT(.ctors.*)))
+	    KEEP (*(SORT(.ctors.*)))
 		KEEP (*(.ctors))	
 	}
-  	.dtors    : 	{
-    		KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-    		KEEP (*(SORT(.dtors.*)))
-    		KEEP (*(.dtors))
+	
+  	.dtors : {
+		KEEP (*crtbegin.o(.dtors))
+		KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+		KEEP (*(SORT(.dtors.*)))
+		KEEP (*(.dtors))
   	}
-*/
 
 	/DISCARD/ : {
 		/* Ignore .reginfo. It is not needed and adds bloat */

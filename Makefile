@@ -3,12 +3,12 @@
 
 include mk/games.mk
 
-VPATH = src/core/ $(GAMEDIR) $(GRDIR)
+VPATH = src/core/ $(GAMEDIR) $(GRDIR) $(MODDIR)
 
 BINDIR := bin/$(GAME)/$(REGION)
 OBJDIR := obj/$(GAME)/$(REGION)
 
-OBJS = $(OBJDIR)/main.o $(OBJDIR)/sio.o $(GAME_$(GAME)_$(REGION)_OBJECTS)
+OBJS = $(OBJDIR)/rt.o $(OBJDIR)/main.o $(OBJDIR)/sio.o $(OBJDIR)/mod.o $(GAME_$(GAME)_$(REGION)_OBJECTS)
 
 include mk/ee.mk
 
@@ -29,7 +29,7 @@ $(OBJDIR)/linktmp.ld: link/ml2core.ld $(GRDIR)/symbols.ld
 
 # note that the linker script is preprocessed so that we can add game/region-specific definitions
 $(BINDIR)/core.elf: $(OBJS) $(OBJDIR)/linktmp.ld
-	$(LD) -nostartfiles -T $(OBJDIR)/linktmp.ld $(OBJS) -o $@
+	$(LD) -nostartfiles -T $(OBJDIR)/linktmp.ld $(EE_CRTBEGIN) $(OBJS) $(EE_CRTEND) -o $@
 
 $(BINDIR)/:
 	mkdir -p $@

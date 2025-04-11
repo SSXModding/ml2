@@ -3,7 +3,12 @@ CXX = tools/cc/bin/ee-g++
 LD = tools/cc/bin/ee-ld
 OBJCOPY = tools/cc/bin/ee-objcopy
 OBJDUMP = tools/cc/bin/ee-objdump
-CXXFLAGS = -G0 -O3 -ffreestanding -fno-rtti -fno-exceptions -nostdlib -I include
+CXXFLAGS = -G0 -O3 -ffreestanding -fno-rtti -fno-exceptions -nostdlib -I include -I $(GAMEDIR)
+
+# Needed for some stuff
+EE_LIBDIR=tools/cc/lib/gcc-lib/ee/2.96-ee-001003-1
+EE_CRTBEGIN=$(EE_LIBDIR)/crtbegin.o
+EE_CRTEND=$(EE_LIBDIR)/crtend.o
 
 # b
 $(OBJDIR)/%.o: %.cpp
