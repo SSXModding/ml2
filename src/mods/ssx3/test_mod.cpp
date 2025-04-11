@@ -1,4 +1,5 @@
 #include <ml/mod.hpp>
+#include <ml/game.h>
 #include "game_api.h"
 
 cFont* getDebugFont() {
@@ -10,6 +11,10 @@ void cGame_renderHook(void* pGame) {
 	getDebugFont()->text(30., 120., "Hello World!");
 	cGame_render(pGame);
 }
+
+#if REGION(us)
+    #define CGAME_RENDER_VPTR_ADDRESS 0x0047d14c
+#endif
 
 struct testMod : public mlMod {
     virtual const mlModMeta& getMeta() const {
@@ -23,11 +28,11 @@ struct testMod : public mlMod {
     virtual const char* getId() const { return "test"; }
 
     virtual void enable() {
-	    *((void**)0x0047d14c) = (void*)cGame_renderHook;
+	    *((void**)CGAME_RENDER_VPTR_ADDRESS) = (void*)cGame_renderHook;
     }
 
     virtual void disable() {
-	    *((void**)0x0047d14c) = (void*)cGame_render;
+	    *((void**)CGAME_RENDER_VPTR_ADDRESS) = (void*)cGame_render;
     }
 };
 

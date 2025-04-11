@@ -8,9 +8,13 @@ VPATH = src/core/ $(GAMEDIR) $(GRDIR) $(MODDIR)
 BINDIR := bin/$(GAME)/$(REGION)
 OBJDIR := obj/$(GAME)/$(REGION)
 
-OBJS = $(OBJDIR)/rt.o $(OBJDIR)/main.o $(OBJDIR)/sio.o $(OBJDIR)/mod.o $(GAME_$(GAME)_$(REGION)_OBJECTS)
+OBJS = $(OBJDIR)/cxx_new_delete.o $(OBJDIR)/cxx_runtime.o \
+	 $(OBJDIR)/main.o $(OBJDIR)/sio.o $(OBJDIR)/mod.o \
+	$(GAME_$(GAME)_$(REGION)_OBJECTS)
 
 include mk/ee.mk
+
+CXXFLAGS += $(GAMEDEFS)
 
 
 all: $(BINDIR)/ $(OBJDIR)/ $(BINDIR)/$(GAME_$(GAME)_$(REGION)_PNACH)

@@ -2,7 +2,9 @@
 #include <ml/types.h>
 
 // This provides implementation of some GCC C/C++
-// runtime stuff that's needed.
+// runtime stuff that's needed, *without* dragging in
+// libgcc, since that requires a lot of libc to also be
+// dragged in (and we don't want that!).
 
 extern "C" {
     void __pure_virtual() {
@@ -11,12 +13,9 @@ extern "C" {
         while(true);
     }
 
-    void __builtin_delete() {
-        return;
-    }
-
     typedef void(*vfunc)();
 
+    // Global constructors
     extern vfunc __CTOR_LIST__[];
 
     void __do_global_ctors() {
