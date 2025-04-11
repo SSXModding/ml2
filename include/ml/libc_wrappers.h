@@ -15,6 +15,7 @@ void* mlMalloc(u32 size);
 void mlFree(void* pMemory);
 void mlMemSet(void* pBuffer, int c, u32 len);
 void mlMemCpy(void* pDestBuffer, const void* pSrcBuffer, u32 copyLen);
+i32 mlStrCmp(const char* pszLeft, const char* pszRight);
 
 // Can be implemented by hand with SCE FIO if desired.
 void* mlLoadFile(const char* pszFileName);

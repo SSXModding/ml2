@@ -4,6 +4,7 @@
 #include <ml/types.h>
 
 #include "game_api.h"
+#include "ml/libc_wrappers.h"
 
 extern "C" {
 
@@ -22,6 +23,10 @@ void mlMemSet(void* pBuffer, int c, u32 len) {
 
 void mlMemCpy(void* pDestBuffer, const void* pSrcBuffer, u32 copyLen) {
 	memcpy(pDestBuffer, pSrcBuffer, copyLen);
+}
+
+i32 mlStrCmp(const char *pszLeft, const char *pszRight) {
+	return strcmp(pszLeft, pszRight);
 }
 
 void* mlLoadFile(const char* pszFileName) {

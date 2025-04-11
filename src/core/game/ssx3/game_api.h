@@ -11,6 +11,7 @@ extern "C" {
 
         void* memset(void* ptr, int c, unsigned int length);
         void* memcpy(void* pDest, const void* pSrc, unsigned int length);
+        int strcmp(const char* pszLeft, const char* pszRight);
 
         void scePrintf(const char* pszFormat, ...);
 

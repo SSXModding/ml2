@@ -17,6 +17,7 @@ CORE_LOAD_ADDRESS = 0x53f140;
 /* libc */
 memset = 0x00416210;
 memcpy = 0x0041605c;
+strcmp = 0x004165a8;
 
 scePrintf = 0x00425c60;
 
