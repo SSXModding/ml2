@@ -3,43 +3,56 @@
 
 /// Metadata
 struct mlModMeta {
-    const char* pszAuthor;
-    const char* pszModName;
+	const char* pszAuthor;
+	const char* pszModName;
 };
 
-/// A mod
+/// A mod.
 struct mlMod {
-    mlMod() {
-        pNextMod = 0;
-    }
-    virtual ~mlMod() {}
+	mlMod() {
+		pNextMod = 0;
+		enabled = false;
+	}
 
-    // metadata
-    virtual const mlModMeta& getMeta() const = 0;
-    virtual const char* getId() const = 0;
+	virtual ~mlMod() {
+	}
 
-    // Enable/disable mods.
-    virtual void enable() = 0;
+	// metadata
+	virtual const mlModMeta& getMeta() const = 0;
+	virtual const char* getId() const = 0;
 
-    virtual void disable() = 0;
+	// Enable/disable mods.
+	virtual void enable() {
+		enabled = true;
+	}
 
-    mlMod* pNextMod;
+	virtual void disable() {
+		enabled = false;
+	}
+
+	bool isEnabled() const {
+		return enabled;
+	}
+
+	// Only public for internals. Do not abuse this
+	mlMod* pNextMod;
+	bool enabled;
 };
 
-void mlRegisterMod(mlMod* pMod);
+void mlModRegister(mlMod* pMod);
 void mlModForEach(bool (*pcbCallback)(mlMod* pMod, void* context), void* context);
-mlMod* mlFindMod(const char* pszName);
+mlMod* mlModGetById(const char* pszName);
 
-template<class T>
+template <class T>
 struct mlModAutoRegister {
-    mlModAutoRegister(T* pMod) {
-        mlRegisterMod((mlMod*)pMod);
-    }
+	mlModAutoRegister(T* pMod) {
+		mlModRegister((mlMod*)pMod);
+	}
 };
 
 // Register a mod.
-#define ML_REGISTER_MOD(T) \
-    static T __modInstance_##T; \
-    static mlModAutoRegister<T> __modRegister_##T(&__modInstance_##T);
+#define ML_REGISTER_MOD(T)      \
+	static T __modInstance_##T; \
+	static mlModAutoRegister<T> __modRegister_##T(&__modInstance_##T);
 
 #endif

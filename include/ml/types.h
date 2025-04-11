@@ -20,4 +20,7 @@ typedef double f64;
 typedef size_t usize;
 typedef ptrdiff_t isize;
 
+// Returns a typed null pointer.
+#define nil(T) (T)0
+
 #endif

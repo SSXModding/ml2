@@ -15,7 +15,7 @@ struct testMod : public mlMod {
     virtual const mlModMeta& getMeta() const {
         static mlModMeta meta =  {
             "modeco80",
-            "a"
+            "Test Mod"
         };
         return meta;
     }

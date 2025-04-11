@@ -8,11 +8,10 @@
 void mlGameInit() {
 	sioPuts("mlGameInit() called");
 
-	// do some testing
-	if(mlFindMod("test") != 0) {
-		sioPuts("found test mod");
-	} else {
-		sioPuts(":( couldn't find test mod");
+	mlMod* pMod = mlModGetById("test");
+	if(pMod) {
+		scePrintf("Enabling test mod\n");
+		pMod->enable();
 	}
 }
 

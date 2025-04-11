@@ -3,10 +3,7 @@
 
 #include <ml/mod.hpp>
 
-// Returns a typed null pointer.
-#define nil(T) (T)0
-
-//
+// The head of the mod intrusive linked list.
 static mlMod* modListHead = nil(mlMod*);
 
 // Returns true if both strings are equal and the same length.
@@ -14,19 +11,16 @@ bool strEqual(const char* pszLeft, const char* pszRight) {
 	return !mlStrCmp(pszLeft, pszRight);
 }
 
-void mlRegisterMod(mlMod* pMod) {
-	sioPuts("registering mod: ");
-	sioPuts(pMod->getId());
-
-	// TODO
+void mlModRegister(mlMod* pMod) {
 	if(modListHead == nil(mlMod*)) {
-		sioPuts("RRRRR");
 		modListHead = pMod;
 		return;
 	}
 
+    // Find the mod which doesn't have a set next mod pointer 
+    // and add this mod to it.
 	mlMod* pIter = modListHead;
-	while(pIter->pNextMod != nil(mlMod*)) {
+	while(pIter != nil(mlMod*)) {
 		pIter = pIter->pNextMod;
 	}
 
@@ -72,7 +66,7 @@ struct findModContext {
 	}
 };
 
-mlMod* mlFindMod(const char* pszModId) {
+mlMod* mlModGetById(const char* pszModId) {
 	// No mods are registered. We can't really find
 	// something from nothing, so just return nil
 	if(modListHead == nil(mlMod*))

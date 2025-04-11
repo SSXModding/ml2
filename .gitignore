@@ -6,8 +6,10 @@ obj/
 
 compile_commands.json
 
+# tools which shouldn't be distributed as a part of the repository
 tools/cc
 tools/armips.exe
+tools/armips
 
 # fucking pythonnnnnnn
 /**/__pycache__
