@@ -5,24 +5,30 @@ include mk/games.mk
 
 VPATH = src/core/ $(GAMEDIR) $(GRDIR) $(MODDIR)
 
-BINDIR := bin/$(GAME)/$(REGION)
-OBJDIR := obj/$(GAME)/$(REGION)
+BINDIR := bin/$(GAME)/$(VERSION)
+OBJDIR := obj/$(GAME)/$(VERSION)
 
-OBJS = $(OBJDIR)/cxx_new_delete.o $(OBJDIR)/cxx_runtime.o \
-	 $(OBJDIR)/main.o $(OBJDIR)/sio.o $(OBJDIR)/mod.o \
-	$(GAME_$(GAME)_$(REGION)_OBJECTS)
+# runtime
+RUNTIME_OBJECTS = \
+	$(OBJDIR)/cxx_new_delete.o \
+	$(OBJDIR)/cxx_runtime.o \
+	$(OBJDIR)/sio.o
+
+OBJS = $(RUNTIME_OBJECTS) \
+	$(OBJDIR)/main.o $(OBJDIR)/mod.o \
+	$(GAME_$(GAME)_$(VERSION)_OBJECTS)
 
 include mk/ee.mk
 
 CXXFLAGS += $(GAMEDEFS)
 
 
-all: $(BINDIR)/ $(OBJDIR)/ $(BINDIR)/$(GAME_$(GAME)_$(REGION)_PNACH)
+all: $(BINDIR)/ $(OBJDIR)/ $(BINDIR)/$(GAME_$(GAME)_$(VERSION)_PNACH)
 
 clean:
 	rm -rf $(BINDIR)/ $(OBJDIR)/
 
-$(BINDIR)/$(GAME_$(GAME)_$(REGION)_PNACH): $(BINDIR)/core.bin $(GAME_$(GAME)_$(REGION)_PRODUCTS)
+$(BINDIR)/$(GAME_$(GAME)_$(VERSION)_PNACH): $(BINDIR)/core.bin $(GAME_$(GAME)_$(VERSION)_PRODUCTS)
 	tools/pnach_utils/output_pnach.py $(GRDIR)/patch.json $@
 
 $(BINDIR)/core.bin: $(BINDIR)/core.elf

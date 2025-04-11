@@ -1,6 +1,6 @@
 GAME_ssx3_mods = test_mod
 
-# US region
+# US version
 GAME_ssx3_us_VALID = yes
 GAME_ssx3_us_OBJECTS = $(OBJDIR)/func_wrappers.o $(OBJDIR)/init.o $(foreach mod,$(GAME_ssx3_mods),$(OBJDIR)/$(mod).o)
 GAME_ssx3_us_PRODUCTS = $(BINDIR)/crt0_patch.bin $(BINDIR)/libkernl_patch.bin $(BINDIR)/systeminit_patch.bin

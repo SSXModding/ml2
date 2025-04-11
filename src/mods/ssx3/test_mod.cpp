@@ -12,7 +12,7 @@ void cGame_renderHook(void* pGame) {
 	cGame_render(pGame);
 }
 
-#if REGION(us)
+#if VERSION(us)
     #define CGAME_RENDER_VPTR_ADDRESS 0x0047d14c
 #endif
 
