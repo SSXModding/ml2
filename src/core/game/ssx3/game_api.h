@@ -33,6 +33,7 @@ extern "C" {
                 cGame* pGame;
         };
 
+        
         extern cSSXApplication* SSXApp;
 
         unsigned int BXFILE_size(const char* pszFileName);
