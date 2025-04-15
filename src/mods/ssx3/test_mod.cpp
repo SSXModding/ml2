@@ -10,10 +10,10 @@ cFont* getDebugFont() {
 	return game->pDebugFont;
 }
 
-mlVTHookMan0<void, void> cGame_Render_vthook;
+mlVtHookMan0<void, void> cGame_Render_vthook;
 
 void cGame_renderHook(void* pGame) {
-    mlVTHookMan0<void*, void>::ResultType res = cGame_Render_vthook.Call(pGame);
+    mlVtHookMan0<void*, void>::ResultType res = cGame_Render_vthook.Call(pGame);
     if(res.code == kVtHook_RunOriginal) {
 	    cGame_render(pGame);
     }

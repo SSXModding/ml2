@@ -1,0 +1,30 @@
+/// VtHook Manager for {{ data.nr_args }} Arguments
+template<class ClassType, class RetType{{ data.signature_template_types }}>
+struct {{data.name}} {
+    typedef mlVtHookResult<RetType> ResultType;
+	typedef ResultType (*PfnHook)(ClassType*{{ data.signature }});
+#ifdef ML_VTHOOK_USE_VEC // TODO
+	typedef mlVec<PfnHook> ListType;
+#else
+	typedef mlList<PfnHook> ListType;
+#endif
+
+	ResultType Call(ClassType* pThat{{ data.signature }}) {
+		u32 listLength = hookList.Size();
+		ResultType lastResult;
+		for(u32 i = 0; i < listLength; ++i) {
+			lastResult = hookList[i](pThat{{ data.signature_call }});
+			if(lastResult.code == kVtHook_Abort)
+				break;
+		}
+
+		return lastResult;
+	}
+
+	void RegisterHook(PfnHook hook) {
+		hookList.pushBack(hook);
+	}
+
+    private:
+        ListType hookList;
+};

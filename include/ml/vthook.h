@@ -37,34 +37,9 @@ struct mlVtHookResult<void> {
 	}
 };
 
-template <class ClassType, class RetType>
-struct mlVTHookMan0 {
-	typedef mlVtHookResult<RetType> ResultType;
-	typedef ResultType (*PfnHook)(ClassType* pThat);
-#ifdef USE_VEC
-    typedef mlVec<PfnHook> ListType;
-#else
-    typedef mlList<PfnHook> ListType;
-#endif
+// Include the generated managers
+#include "vthook_generated.hpp"
 
-	ResultType Call(ClassType* pThat) {
-		u32 listLength = hookList.Size();
-		ResultType lastResult;
-		for(u32 i = 0; i < listLength; ++i) {
-			lastResult = hookList[i](pThat);
-			if(lastResult.code == kVtHook_Abort)
-				break;
-		}
-
-		return lastResult;
-	}
-
-	void RegisterHook(PfnHook hook) {
-		hookList.pushBack(hook);
-	}
-
-   private:
-	ListType hookList;
-};
+// TODO: helper macros maybe
 
 #endif
