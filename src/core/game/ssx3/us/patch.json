@@ -6,13 +6,13 @@
         {
             "name": "Patch Sony crt0 to move heap start",
             "org": "0x00100180",
-            "source": "bin/ssx3/us/crt0_extend_heap.bin"
+            "source": "bin/ssx3/us/crt0_patch.bin"
         },
 
         {
             "name": "Patch Sony libkernl to move heap start",
             "org": "0x0045516c",
-            "source": "bin/ssx3/us/libkernl_extend_heap.bin"
+            "source": "bin/ssx3/us/libkernl_patch.bin"
         },
 
         {
