@@ -1,0 +1,30 @@
+{
+    "patchName": "Lily\\ML2",
+    "patchAuthor": "Lily/modeco80",
+    "patchDescription": "Modloader 2 for SSX OG",
+    "patchSegments": [
+        {
+            "name": "Patch Sony crt0 to move heap start",
+            "org": "0x00100068",
+            "source": "bin/ssxog/us/crt0_patch.bin"
+        },
+
+        {
+            "name": "Patch Sony libkernl to move heap start",
+            "org": "0x002a6a9c",
+            "source": "bin/ssxog/us/libkernl_patch.bin"
+        },
+
+        {
+            "name": "ML2 Entry point (Patches systemInit())",
+            "org": "0x0018a7e0",
+            "source": "bin/ssxog/us/systeminit_patch.bin"
+        },
+
+        {
+            "name": "ML2 Core",
+            "org": "0x002d8900",
+            "source": "bin/ssxog/us/core.bin"
+        }
+    ]
+}
