@@ -15,6 +15,9 @@ extern "C" {
 
         void scePrintf(const char* pszFormat, ...);
 
+        // FIXME: Everything below here should actually have C++ linkage
+        // and their actual names
+
         void* memAlloc(unsigned int length, const char* name, unsigned flags = 0, unsigned flags2 = 0);
         void memFree(void* ptr);
 
