@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
-from jinja2 import Environment, FileSystemLoader
 
 # This script generates individual mlVtHookMan* C++ implementations
 # from a single Jinja template. While this code generation
 # is, in multiple aspects, quite annoying, it's the least
 # friction required short of implementing Babel for C++,
 # which... I'm not going to do. Sorry
+
+import sys
+from jinja2 import Environment, FileSystemLoader
 
 kMaxArguments = 9 # 10 actually but whatever!!!
 
@@ -17,7 +19,7 @@ def formatArgName(i):
     return f'arg{i}'
 
 env = Environment(loader=FileSystemLoader('.'), trim_blocks=True, lstrip_blocks=True)
-template = env.get_template('vthook_template.jinja2')
+template = env.get_template('tools/vthook_template.jinja2')
 outputs = []
 
 for i in range(0, kMaxArguments+1):
@@ -46,7 +48,7 @@ for i in range(0, kMaxArguments+1):
     output = template.render(data=data)
     outputs.append(output)
 
-with open(f'vthook_generated.hpp', 'w') as hppFile:
+with open(sys.argv[1], 'w') as hppFile:
     hppFile.write('#ifndef ML_VTHOOK_GENERATED_HPP\n')
     hppFile.write('#define ML_VTHOOK_GENERATED_HPP\n\n')
     hppFile.write('// This file was generated. Do not edit it, changes will be lost the next time it is regenerated.\n\n')

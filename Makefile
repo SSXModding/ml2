@@ -23,10 +23,13 @@ include mk/ee.mk
 CXXFLAGS += $(GAMEDEFS)
 
 
-all: $(BINDIR)/ $(OBJDIR)/ $(BINDIR)/$(GAME_$(GAME)_$(VERSION)_PNACH)
+all: $(BINDIR)/ $(OBJDIR)/ $(OBJDIR)/vthook_generated.hpp $(BINDIR)/$(GAME_$(GAME)_$(VERSION)_PNACH)
 
 clean:
 	rm -rf $(BINDIR)/ $(OBJDIR)/
+
+$(OBJDIR)/vthook_generated.hpp: tools/vthook_template.jinja2 tools/generate_vthook.py
+	tools/generate_vthook.py $@
 
 $(BINDIR)/$(GAME_$(GAME)_$(VERSION)_PNACH): $(BINDIR)/core.bin $(GAME_$(GAME)_$(VERSION)_PRODUCTS)
 	tools/pnach_utils/output_pnach.py $(GRDIR)/patch.json $@
