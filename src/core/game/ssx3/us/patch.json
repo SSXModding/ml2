@@ -1,7 +1,7 @@
 {
     "patchName": "Lily\\ML2",
     "patchAuthor": "Lily/modeco80",
-    "patchDescription": "Modloader 2: Elfldr but cooler (as a single pnach)",
+    "patchDescription": "Modloader 2 for SSX 3",
     "patchSegments": [
         {
             "name": "Patch Sony crt0 to move heap start",
