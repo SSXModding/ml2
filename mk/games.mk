@@ -18,8 +18,9 @@ GAMEDEFS = -DGAME_$(GAME)=1 -DVERSION_$(VERSION)=1
 # GAME_[game]_[version]_PRODUCTS=custom products to add to the build
 # GAME_[game]_[version]_PNACH=output PNACH filename (using new pnach organization format)
 
-include mk/$(GAME).mk
+include mk/games/$(GAME).mk
 
+# sanity check
 ifneq ($(GAME_$(GAME)_$(VERSION)_VALID),yes)
 $(error The game/version combination $(GAME)/$(VERSION) is currently not supported by ml2. Please pick a different one)
 endif

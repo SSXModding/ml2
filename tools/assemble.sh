@@ -4,8 +4,8 @@
 set -euo pipefail
 
 # Query addresses from core.elf (they are valid for the bin file too)
-END_ADDRESS=$(printf '0x%s' $(tools/cc/bin/ee-objdump -t $2 | grep "_end" | cut -d' ' -f1 | cut -c9-))
-MLSTART_ADDRESS=$(printf '0x%s' $(tools/cc/bin/ee-objdump -t $2 | grep "mlStart" | cut -d' ' -f1 | cut -c9-))
+END_ADDRESS=$(printf '0x%s' $($OBJDUMP -t $2 | grep "_end" | cut -d' ' -f1 | cut -c9-))
+MLSTART_ADDRESS=$(printf '0x%s' $($OBJDUMP -t $2 | grep "mlStart" | cut -d' ' -f1 | cut -c9-))
 
 echo "End is $END_ADDRESS"
 echo "mlStart @ $MLSTART_ADDRESS"
