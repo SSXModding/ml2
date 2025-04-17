@@ -1,3 +1,6 @@
+#ifndef ML_LIST_HPP
+#define ML_LIST_HPP
+
 #include <ml/types.h>
 #include <new>
 
@@ -9,8 +12,8 @@ struct mlList {
 		T item;
 	};
 
-    ~mlList() {
-        // TODO: delete all nodes
+    mlList() {
+        pHead = nil(Node*);
     }
 
 	void pushBack(const T& value) {
@@ -61,3 +64,5 @@ struct mlList {
 private:
     Node* pHead;
 };
+
+#endif

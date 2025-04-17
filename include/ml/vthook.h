@@ -4,7 +4,8 @@
 #include <ml/cxx/vec.hpp>
 #include <ml/cxx/list.hpp>
 
-//#define USE_VEC
+// Because vecs actually clean up after themselves.
+#define ML_VTHOOK_USE_VEC
 
 enum mlVtHookResultCode {
 	kVtHook_Abort,

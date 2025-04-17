@@ -6,7 +6,7 @@
 
 #include <new>
 
-/// A vector.
+/// A vector/dynamic array.
 template <class T>
 struct mlVec {
 	typedef T* Pointer;
@@ -26,15 +26,35 @@ struct mlVec {
 			new(&this->pMemory[i]) T(vec.pMemory[i]);
 	}
 
+	mlVec& operator=(const mlVec& vec) {
+		if(&vec == this) {
+			return *this;
+		}
+
+		Resize(vec.uiSize);
+		for(SizeType i = 0; i < vec.uiSize; ++i)
+			new(&this->pMemory[i]) T(vec.pMemory[i]);
+
+		return *this;
+	}
+
+	~mlVec() {
+		Reserve(0);
+	}
+
 	void Reserve(SizeType newCapacity) {
 		if(newCapacity == 0) {
+			// Destroy any/all allocated objects, if they happen to exist.
 			if(uiCapacity != 0) {
 				destroy(pMemory, uiCapacity);
-				// Reset
-				pMemory = nil(T*);
-				uiCapacity = 0;
-				uiSize = 0;
 			}
+
+			// Reset state so we seem like a default-constructed
+			// mlVec instance.
+			pMemory = nil(T*);
+			uiCapacity = 0;
+			uiSize = 0;
+			return;
 		} else if(newCapacity < uiCapacity) {
 			return;
 		}
