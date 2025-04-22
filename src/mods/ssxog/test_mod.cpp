@@ -15,10 +15,12 @@ struct testMod : public mlMod {
     virtual const char* getId() const { return "test"; }
 
     virtual void enable() {
+        TheApp.mShowFPSDisplay = 1;
 	    sioPuts("Test mod enabled!!! yay >w<\n");
     }
 
     virtual void disable() {
+        TheApp.mShowFPSDisplay = 0;
     }
 };
 

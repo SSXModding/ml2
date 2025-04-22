@@ -21,3 +21,5 @@ strcmp = 0x0025baa0;
 /* REAL Memory */
 MEM_alloc = 0x0023a448;
 MEM_free = 0x0023a998;
+
+TheApp = 0x002852f8;
