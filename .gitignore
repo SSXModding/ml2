@@ -13,3 +13,8 @@ tools/armips
 
 # fucking pythonnnnnnn
 /**/__pycache__
+
+tools/relutils/reldump
+tools/relutils/rellink
+tools/relutils/*.rel
+rools/relutils/*.o
