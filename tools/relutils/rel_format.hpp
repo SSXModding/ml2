@@ -24,6 +24,14 @@ namespace rel {
 		kSection_Reloc = (1 << 2)
 	};
 
+	/// This is a simplified version of the relocation information
+	/// Unlike ELF which relocates by symbol, we relocate by offset.
+	struct RelocationEntry {
+		u16 info; // r_info
+		u32 offset;
+		u32 targetValue;
+	};
+
 	struct SectionHeader {
 		u32 flags; // flags
 		u32 relocationLink;

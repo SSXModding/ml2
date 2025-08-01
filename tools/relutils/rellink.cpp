@@ -27,6 +27,21 @@ struct SectionData {
 
 	/// If not nullptr, this provides data on the section that will relocate
 	SectionData* reloc { nullptr };
+
+	/// Overrides ELF data if this is not empty.
+	std::vector<uint8_t> overrideData;
+
+	std::uint8_t* getData() {
+		if(overrideData.empty())
+			return static_cast<std::uint8_t*>(data->d_buf);
+		return overrideData.data();
+	}
+
+	std::size_t getDataSize() {
+		if(overrideData.empty())
+			return data->d_size;
+		return overrideData.size();
+	}
 };
 
 struct ExtendedSectionHeader {
@@ -184,7 +199,7 @@ struct RelLinker {
 
 	void initSectionHeaderFromInfo(SectionData& section) {
 		rel::SectionHeader sh {};
-		sh.size = section.shdr->sh_size;
+		sh.size = section.getDataSize();
 
 		if(section.shdr->sh_flags & SHF_ALLOC) {
 			sh.flags |= rel::kSection_Load;
@@ -193,7 +208,7 @@ struct RelLinker {
 
 		if(section.shdr->sh_type == SHT_NOBITS) {
 			// This is the .bss section
-			sh.flags = rel::kSection_AllocZeroed;
+			sh.flags |= rel::kSection_AllocZeroed;
 		}
 
 		// This section has a relocation section.
@@ -210,9 +225,40 @@ struct RelLinker {
 		.data = &section });
 
 		if(section.reloc != nullptr) {
+			convertRelocation(*section.reloc);
+
 			// "recurse" and make the relocation section too
 			// This honors the above expectation as well.
 			initSectionHeaderFromInfo(*section.reloc);
+		}
+	}
+
+
+	/// Convert relocation information from depending on symbol table to
+	/// a simpler structure based on the destination VMA address.
+	void convertRelocation(SectionData& relocSection) {
+		auto data = reinterpret_cast<Elf32_Rel*>(relocSection.data->d_buf);
+		auto nRelocs = relocSection.data->d_size / sizeof(Elf32_Rel);
+
+		printf("TODO: Convert relocation information\n");
+
+		for(auto i = 0; i < nRelocs; ++i) {
+			printf("reloc %d: type ", i);
+			switch(ELF32_R_TYPE(data[i].r_info)) {
+#define caseify(c)  \
+	case c:         \
+		printf(#c); \
+		break;
+				caseify(R_MIPS_32);
+				caseify(R_MIPS_26);
+				caseify(R_MIPS_HI16);
+				caseify(R_MIPS_LO16);
+
+				default:
+					assert(false && "unhandled relocation");
+			}
+
+			printf("\n");
 		}
 	}
 
@@ -222,6 +268,7 @@ struct RelLinker {
 		modhdr.magic = REL_MAGIC;
 		modhdr.entrypoint = elf_header->e_entry;
 
+		// Create section data
 		for(auto& pcs : programCoreSections) {
 			initSectionHeaderFromInfo(pcs);
 		}
@@ -252,8 +299,8 @@ struct RelLinker {
 			lseek(outRelFd, s.sectionHeader.offset, SEEK_SET);
 			if((s.sectionHeader.flags & rel::SectionFlags::kSection_AllocZeroed) == 0) {
 				std::printf("writing section \"%s\" to rel\n", getSectionName(*s.data).c_str(), s.sectionHeader.offset);
-				if(auto len = write(outRelFd, &reinterpret_cast<const char*>(s.data->data->d_buf)[0], s.sectionHeader.size); len != s.sectionHeader.size) {
-					std::fprintf(stderr, "Short write of section data (%zu, should be %u)\n", len, s.sectionHeader.size);
+				if(auto len = write(outRelFd, s.data->getData(), s.data->getDataSize()); len != s.data->getDataSize()) {
+					std::fprintf(stderr, "Short write of section data (%zu, should be %u)\n", len, s.data->getDataSize());
 					return 1;
 				}
 			}

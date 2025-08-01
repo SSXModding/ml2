@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 		printf("offset 0x%08x ", s.offset);
 		printf("size 0x%08x ", s.size);
 
-		if((s.flags & rel::kSection_Load) != 0 || (s.flags & rel::kSection_AllocZeroed) != 0 )
+		if((s.flags & rel::kSection_Load) != 0)
 			printf("relative load address 0x%08x ", s.loadAddress);
 		if((s.flags & rel::kSection_Reloc) != 0)
 			printf("reloc section %d", s.relocationLink);
