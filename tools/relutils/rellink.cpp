@@ -3,6 +3,7 @@
 //!
 //! # Nits
 //! - Rewrite to be a bit more modern C++.
+#include <elf.h>
 #include <fcntl.h>
 #include <libelf.h>
 #include <sys/file.h>
@@ -15,6 +16,7 @@
 #include <string>
 #include <vector>
 
+#include "diagman.hpp"
 #include "rel_format.hpp"
 #include "types.hpp"
 
@@ -49,6 +51,8 @@ struct ExtendedSectionHeader {
 	SectionData* data;
 };
 
+rel::cDiagnosticMan gDiagMan("rellink");
+
 struct RelLinker {
 	RelLinker() {
 		// Initalize libelf
@@ -69,16 +73,39 @@ struct RelLinker {
 	}
 
 	Elf_Data* getShStrtab() {
-		// NOTE: init() catches the case of a ELF which may have a zero shstrndx, which should mean
-		// we don't have to worry about this? I think? Idk.
 		auto shstr = elf_getscn(elf, elf_header->e_shstrndx);
 		auto shstr_data = elf_getdata(shstr, nullptr);
-		assert(shstr_data != nullptr && "how did you even hit this what");
 		return shstr_data;
 	}
 
 	std::string getSectionName(const SectionData& si) {
 		return std::string(&static_cast<char*>(getShStrtab()->d_buf)[si.shdr->sh_name]);
+	}
+
+	std::string getSymbolName(const Elf32_Sym& sym) {
+		auto* strtab = getSectionData(".strtab");
+		if(!strtab)
+			gDiagMan.emitFatalError("no .strtab in binary");
+		return std::string(&static_cast<char*>(strtab->d_buf)[sym.st_name]);
+	}
+
+	Elf_Data* getSectionData(const std::string_view sectionName) {
+		// this is not at all performant but this code should hopefully NEVER
+		// EVER be hot. never.
+		for(u32 i = 1; i < (elf_header->e_shnum); ++i) {
+			auto scn = elf_getscn(elf, i);
+			auto shdr = elf32_getshdr(scn);
+			auto name = std::string(&static_cast<char*>(getShStrtab()->d_buf)[shdr->sh_name]);
+
+			if(name == sectionName)
+				return elf_rawdata(scn, nullptr);
+		}
+
+		return nullptr;
+	}
+
+	Elf32_Shdr* getSectionHeader(u32 sectionIndex) {
+		return elf32_getshdr(elf_getscn(elf, sectionIndex));
 	}
 
 	std::string getSectionName(u32 index) {
@@ -93,7 +120,7 @@ struct RelLinker {
 	/// Obtains the sections which are part of the program core
 	/// (i.e: they are loaded into memory)
 	void initProgramCoreSections() {
-		for(u32 i = 1; i < (elf_header->e_shnum - 1); ++i) {
+		for(u32 i = 1; i < (elf_header->e_shnum); ++i) {
 			auto scn = elf_getscn(elf, i);
 			auto shdr = elf32_getshdr(scn);
 			auto sdat = elf_rawdata(scn, nullptr);
@@ -111,7 +138,7 @@ struct RelLinker {
 	void initRelocationSections() {
 		std::vector<u32> relocLinks;
 
-		for(u32 i = 1; i < (elf_header->e_shnum - 1); ++i) {
+		for(u32 i = 1; i < (elf_header->e_shnum); ++i) {
 			auto scn = elf_getscn(elf, i);
 			auto shdr = elf32_getshdr(scn);
 			auto sdat = elf_rawdata(scn, nullptr);
@@ -139,26 +166,26 @@ struct RelLinker {
 	int init(const char* input_elf_path, const char* output_rel_path) {
 		inElfFd = open(input_elf_path, O_RDONLY);
 		if(inElfFd == -1) {
-			std::fprintf(stderr, "could not open input ELF file \"%s\": %s\n", input_elf_path, strerror(errno));
+			gDiagMan.emitError("could not open input ELF file \"%s\": %s", input_elf_path, strerror(errno));
 			return 1;
 		}
 
 		elf = elf_begin(inElfFd, ELF_C_READ, nullptr);
 		if(elf == nullptr) {
-			std::fprintf(stderr, "libelf elf_begin() failed: %s\n", elf_errmsg(elf_errno()));
+			gDiagMan.emitError("libelf elf_begin() failed: %s", elf_errmsg(elf_errno()));
 			return 1;
 		}
 
 		// Make sure the input ELF is actually an ELF file
 		if(elf_kind(elf) != ELF_K_ELF) {
-			std::fprintf(stderr, "libelf doesn't recognize your input. Make sure you're pointing this to an actual ELF file\n");
+			gDiagMan.emitError("libelf doesn't recognize your input. Make sure you're pointing this to an actual ELF file");
 			return 1;
 		}
 
 		// .. and that it's ELF32.
 		elf_header = elf32_getehdr(elf);
 		if(elf_header == nullptr) {
-			std::fprintf(stderr, "Input ELF must be ELF32.\n");
+			gDiagMan.emitError("Input ELF must be ELF32.");
 			return 1;
 		}
 
@@ -166,24 +193,46 @@ struct RelLinker {
 		// (it's relocatable, MIPS, and has the e_flags that EE-GCC outputs)
 
 		if(elf_header->e_type != ET_REL) {
-			std::fprintf(stderr, "Input ELF must be relocatable.\n");
+			gDiagMan.emitError("Input ELF must be relocatable.");
 			return 1;
 		}
 
 		if(elf_header->e_machine != EM_MIPS && (elf_header->e_flags & 0x2092'0000) == 0) {
-			std::fprintf(stderr, "Input ELF is not for the EE.\n");
+			gDiagMan.emitError("Input ELF is not for the EE.");
 			return 1;
 		}
 
 		if(elf_header->e_shstrndx == 0) {
-			std::fprintf(stderr, "Input ELF does not have a .shstrtab\n");
+			gDiagMan.emitError("Input ELF does not have a .shstrtab");
 			return 1;
 		}
+
+		auto symtab = getSectionData(".symtab");
+
+		if(!symtab) {
+			// how the fuck do you even DO that? no like seriously
+			gDiagMan.emitError("Input ELF does not have a symbol table??? What?");
+			return 1;
+		}
+
+		elf_symbol_table = static_cast<Elf32_Sym*>(symtab->d_buf);
+		elf_symbol_table_length = symtab->d_size / sizeof(Elf32_Sym);
+
+		auto sectab = getSectionData(".symtab");
+
+		if(!symtab) {
+			// how the fuck do you even DO that? no like seriously
+			gDiagMan.emitError("Input ELF does not have a symbol table??? What?");
+			return 1;
+		}
+
+		elf_symbol_table = static_cast<Elf32_Sym*>(symtab->d_buf);
+		elf_symbol_table_length = symtab->d_size / sizeof(Elf32_Sym);
 
 		// Once we've verified the input ELF is usable, create and open the output REL file.
 		outRelFd = open(output_rel_path, O_RDWR | O_CREAT, (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
 		if(outRelFd == -1) {
-			std::fprintf(stderr, "could not open output \"%s\": %s\n", output_rel_path, strerror(errno));
+			gDiagMan.emitFatalError("could not open output \"%s\": %s\n", output_rel_path, strerror(errno));
 			return 1;
 		}
 
@@ -233,29 +282,39 @@ struct RelLinker {
 		}
 	}
 
-
 	/// Convert relocation information from depending on symbol table to
 	/// a simpler structure based on the destination VMA address.
 	void convertRelocation(SectionData& relocSection) {
-		auto data = reinterpret_cast<Elf32_Rel*>(relocSection.data->d_buf);
-		auto nRelocs = relocSection.data->d_size / sizeof(Elf32_Rel);
+		// ELF relocation table
+		auto pElfRelocs = reinterpret_cast<Elf32_Rel*>(relocSection.data->d_buf);
+		auto nElfRelocs = relocSection.data->d_size / sizeof(Elf32_Rel);
 
-		printf("TODO: Convert relocation information\n");
+		// working buffer for converted REL relocations
+		std::vector<rel::RelocationEntry> relocTemp;
 
-		for(auto i = 0; i < nRelocs; ++i) {
-			printf("reloc %d: type ", i);
-			switch(ELF32_R_TYPE(data[i].r_info)) {
-#define caseify(c)  \
-	case c:         \
-		printf(#c); \
-		break;
-				caseify(R_MIPS_32);
-				caseify(R_MIPS_26);
-				caseify(R_MIPS_HI16);
-				caseify(R_MIPS_LO16);
+		gDiagMan.emitWarning("TODO: Convert relocation information");
 
+		for(auto i = 0; i < nElfRelocs; ++i) {
+			if(ELF32_ST_TYPE(elf_symbol_table[ELF32_R_SYM(pElfRelocs[i].r_info)].st_info) != STT_SECTION) {
+				gDiagMan.emitError("Unhandled non-local relocation. Please make sure the input ELF is fully linked.");
+			}
+
+			printf("Reloc %d: type ", i);
+			switch(ELF32_R_TYPE(pElfRelocs[i].r_info)) {
+#define REL_CASE(c)                                                                                                        \
+	case c: {                                                                                                             \
+		auto& sym = elf_symbol_table[(elf_header->e_shnum) + ELF32_R_SYM(pElfRelocs[i].r_info)];                            \
+		auto st_index = sym.st_shndx;                                                                                     \
+		auto* shdr = getSectionHeader(st_index); \
+		printf(#c " target VMA %08x symbol %d (%s @ %08x)", pElfRelocs[i].r_offset, ELF32_R_SYM(pElfRelocs[i].r_info), getSymbolName(sym).c_str(), shdr->sh_addr + sym.st_value); \
+	} break;
+				REL_CASE(R_MIPS_32);
+				REL_CASE(R_MIPS_26);
+				REL_CASE(R_MIPS_HI16);
+				REL_CASE(R_MIPS_LO16);
+#undef REL_CASE
 				default:
-					assert(false && "unhandled relocation");
+					gDiagMan.emitFatalError("unhandled relocation type 0x%08x", ELF32_R_TYPE(pElfRelocs[i].r_info));
 			}
 
 			printf("\n");
@@ -276,7 +335,7 @@ struct RelLinker {
 		modhdr.nrSections = sectionHeaders.size();
 
 		if(auto len = write(outRelFd, &modhdr, sizeof(modhdr)); len != sizeof(modhdr)) {
-			std::fprintf(stderr, "Short write of module header (%zu, should be %zu)\n", len, sizeof(modhdr));
+			gDiagMan.emitFatalError("Short write of module header (%zu, should be %zu)\n", len, sizeof(modhdr));
 			return 1;
 		}
 
@@ -287,7 +346,7 @@ struct RelLinker {
 				s.sectionHeader.offset = offset;
 
 			if(auto len = write(outRelFd, &s.sectionHeader, sizeof(s.sectionHeader)); len != sizeof(s.sectionHeader)) {
-				std::fprintf(stderr, "Short write of section header (%zu, should be %zu)\n", len, sizeof(s.sectionHeader));
+				gDiagMan.emitFatalError("Short write of section header (%zu, should be %zu)\n", len, sizeof(s.sectionHeader));
 				return 1;
 			}
 
@@ -300,7 +359,7 @@ struct RelLinker {
 			if((s.sectionHeader.flags & rel::SectionFlags::kSection_AllocZeroed) == 0) {
 				std::printf("writing section \"%s\" to rel\n", getSectionName(*s.data).c_str(), s.sectionHeader.offset);
 				if(auto len = write(outRelFd, s.data->getData(), s.data->getDataSize()); len != s.data->getDataSize()) {
-					std::fprintf(stderr, "Short write of section data (%zu, should be %u)\n", len, s.data->getDataSize());
+					gDiagMan.emitFatalError("Short write of section data (%zu, should be %u)\n", len, s.data->getDataSize());
 					return 1;
 				}
 			}
@@ -315,6 +374,12 @@ struct RelLinker {
 
 	Elf* elf { nullptr };
 	Elf32_Ehdr* elf_header;
+
+	Elf32_Shdr* elf_section_table;
+	std::size_t elf_section_table_length;
+
+	Elf32_Sym* elf_symbol_table;
+	std::size_t elf_symbol_table_length;
 
 	std::vector<SectionData> programCoreSections;
 	std::vector<SectionData> relocSections;
